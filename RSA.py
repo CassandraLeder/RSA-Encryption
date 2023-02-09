@@ -9,23 +9,6 @@ RSA ENCRYPTION
 import gcd
 import fastExpo
 import random
-
-def main():
-    p = 7
-    q = 3
-    phi = (p-1) * (q-1)
-    message = 122
-
-    e = generateE(phi)
-    
-    gcd.extended_gcd(e,phi)
-    d = gcd.x // phi 
-    
-    c = encrypt(message, e, phi)
-    m = decrypt(c, d, phi)
-    
-    print(message, m)
-
     
 def generateE(phi):
     x = random.randint(1,10)
@@ -45,4 +28,17 @@ def decrypt(c, d, phi):
 
 
 #main will be executed down here
-main()
+p = 7
+q = 3
+phi = (p-1) * (q-1)
+message = 122
+
+e = generateE(phi)
+    
+gcd.extended_gcd(e,phi)
+d = gcd.x // phi 
+    
+c = encrypt(message, e, phi)
+m = decrypt(c, d, phi)
+    
+print(message, m)
