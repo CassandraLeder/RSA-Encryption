@@ -28,8 +28,8 @@ def decrypt(c, d, phi):
 
 
 #main will be executed down here
-p = 7
-q = 3
+p = 709
+q = 907
 phi = (p-1) * (q-1)
 message = 122
 
