@@ -14,7 +14,7 @@ def main():
     p = 7
     q = 3
     phi = (p-1) * (q-1)
-    message = "Hello world!"
+    message = 122
 
     e = generateE(phi)
     
@@ -34,13 +34,12 @@ def generateE(phi):
         x = random.randint(1,10)
     
     return x
-    
+
 def encrypt(message, e, phi):
     c = fastExpo.fastExpo_recursive(message, e, phi)
     return c
     
 def decrypt(c, d, phi):
-    c = encrypt()
     m = fastExpo.fastExpo_recursive(c, d, phi)
     return m
 
