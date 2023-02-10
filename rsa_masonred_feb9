@@ -1,0 +1,162 @@
+#==============================================================================#
+#IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT I#
+#MPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IM#
+#PORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMP#
+#ORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPO#
+#RT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPORT IMPOR#
+#==============================================================================#
+# CSCI 3330 - Algorithms - Dr. Chenyi Hu                                       #
+# RSA Encryption Project 1                                                     #
+# By Cassandra Leder, Mason Red, Casey Weaver                                  #
+# Spring 2023                                                                  #
+
+import math
+import random
+import string
+
+#==============================================================================#
+#FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTI#
+#UNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTIO#
+#NCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION#
+#CTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION #
+#TION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION FUNCTION F#
+#==============================================================================#
+
+#Using Fermat's Test to check prime numbers
+def check_prime_fermat(x):
+    isPrime = True
+    
+    for i in range(1, x):
+        if pow(i, x - 1, x) != 1:
+            isPrime = False
+            break
+
+    if not isPrime:
+        return False
+    
+    else:
+        return True
+
+#recursive function that picks a random integer, and tests if it is prime
+#bigger upper bound = more secure but ur pc may burn down
+def r_find_suitable_prime(lowerBound = 17, upperBound = 999):
+    the = random.randint(lowerBound, upperBound)
+    
+    if check_prime_fermat(the):
+        return the
+    
+    else:
+        return r_find_suitable_prime()
+
+#Takes a message and turns it into numbers - not used
+def char_to_int(inputString):
+    outputString = ""
+    for i in range(len(inputString)):
+        outputString += str(ord(inputString[i]))
+
+    return outputString
+
+#Encrypts your message using the public key
+def encrypt_public_key(inputString, e, n):
+    output = []
+    outputString = ""
+    for i in range(len(inputString)):
+        c = (ord(inputString[i])**e)%n
+        output.append(c)
+        outputString += str(c)
+        
+    return outputString, output
+
+#Decrypts message with private key
+def decrypt_private_key(inputString, d, n):
+    output = []
+    outputString = ""
+    for i in range(len(inputString)):
+        c = (inputString[i]**d)%n
+        output.append(c)
+        
+    return output
+
+#Function to create our public key E
+#how this code works is between me and god
+#this shit worked first fucking try im still in shock
+def create_public_key(phi):
+    n = phi + 1
+    mult = 2
+    while check_prime_fermat(n):
+        n = (phi * mult) + 1
+        mult += 1
+    
+    #can optimize here since this for loop runs more often than necessary
+    #but it costs a handful of milliseconds at worst
+    maxPrimeFactor = 0
+    for i in range(5, int(math.sqrt(n)) + 1, 6): 
+        while n % i == 0:
+            maxPrimeFactor = i
+            n = n / i
+
+        while n % (i + 2) == 0:
+            maxPrimeFactor = i + 2
+            n = n / (i + 2)
+
+    #print(maxPrimeFactor, "our max prime factor is")
+    return maxPrimeFactor
+
+
+#greatest common denominator
+def gcd(a, b):
+    if b == 0:
+        return a
+    else:
+        return gcd(b, a%b)
+
+#==============================================================================#
+#VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLE#
+#ARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES#
+#RIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES #
+#IABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES V#
+#ABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VARIABLES VA#
+#==============================================================================#
+
+# These our are P and Q which we use to determine N and Phi
+p = r_find_suitable_prime()
+q = r_find_suitable_prime()
+
+#N and Phi are calculated here
+n = p * q
+phi = (p - 1) * (q - 1)
+
+#We use a function to create our public key E, and the builtin pow for private key
+e = create_public_key(phi)
+d = pow(e, -1, phi)
+
+#public key <e, n>
+#private key <d, n>
+
+#==============================================================================#
+#MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAI#
+#AIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN#
+#IN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN #
+#N MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN M#
+# MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MA#
+#==============================================================================#
+
+print("======= DEBUG ======")
+print("p:", p, "q:", q)
+print("phi", phi, "n", n)
+print("e:", e, "d:", d)
+print("======= DEBUG ======")
+
+sus = input("hey type something: ")
+cipheredMessage, listCipher = encrypt_public_key(sus, e, n)
+print(cipheredMessage, " is the encrypted text lol unreadable")
+
+
+for i in range(0, len(listCipher)):
+    print(listCipher[i], " ")
+
+
+uncipheredMessage = decrypt_private_key(listCipher, d, n)
+print("yeah below this shouldbe unciphered")
+for i in range(0, len(uncipheredMessage)):
+    print(chr(uncipheredMessage[i]))
